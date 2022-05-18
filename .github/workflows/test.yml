@@ -1,0 +1,27 @@
+    
+name: Test scanners
+
+on:
+  push:
+    branches:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install wget & clamAV antivirus scanner
+        run : |
+           sudo apt-get -qq install -y ca-certificates wget clamav
+           wget --version
+      - name: Install maldet malware scanner
+        run: |
+          wget --no-verbose -O maldet-$VERSION.tar.gz https://github.com/rfxn/linux-malware-detect/archive/$VERSION.tar.gz
+          sha256sum -c - <<< "$SHA256SUM  maldet-$VERSION.tar.gz"
+          sudo mkdir -p maldet-$VERSION
+          sudo tar -xzf maldet-$VERSION.tar.gz --strip-components=1 -C maldet-$VERSION
+          cd maldet-$VERSION
+          sudo ./install.sh
+          sudo maldet -u
+        env: 
+          VERSION: 1.6.4
+          SHA256SUM: 3ad66eebd443d32dd6c811dcf2d264b78678c75ed1d40c15434180d4453e60d2
